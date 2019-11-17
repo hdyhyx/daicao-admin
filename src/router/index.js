@@ -125,8 +125,36 @@ export const constantRoutes = [{
       affix: true
     },
     component: () => import('@/views/product/productList/productList')
+  },
+  {
+    path: '/update',
+    name: 'update',
+    hidden: true,
+    meta: {
+      title: '查看/编辑'
+    },
+    component: () => import('@/views/product/updateProduct/updateProduct')
   }
   ]
+},
+{
+  path: '/uploadData',
+  component: Layout,
+  mate: {
+    title: '下载数据',
+    icon: 'dashboard',
+    affix: true
+  },
+  children: [{
+    path: '/uploadData/list',
+    name: 'list',
+    meta: {
+      title: '下载数据统计',
+      icon: 'dashboard',
+      affix: true
+    },
+    component: () => import('@/views/uploadData/uploadData')
+  }]
 }
 ]
 

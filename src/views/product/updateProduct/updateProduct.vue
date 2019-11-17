@@ -26,8 +26,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="goole地址">
-              <el-input v-model="form.googleUrl" placeholder="请输入APK路径" />
+            <el-form-item label="APK路径">
+              <el-input v-model="form.url" placeholder="请输入APK路径" />
             </el-form-item>
           </el-col>
           <el-col :span="3">
@@ -151,19 +151,15 @@ export default {
           text: ''
         }
       ], // 条件
-      productDescription: [
-        {
-          text: ''
-        }
-      ], // 描述
+      productDescription: [], // 描述
       form: {
         name: '',
-        loanTime: [], // 时间
         interestRate: '', // 利率
+        loanTime: [], // 时间
         loanAmount: [], // 金额
         applicationRequirements: [], // 条件
         productDescription: [], // 描述
-        googleUrl: '', // 路径
+        url: '', // 路径
         productIcon: '', // 图标
         approvalRate: '', // 通过率
         sort: '', // 排序
@@ -171,6 +167,51 @@ export default {
       },
       fileList: []
     }
+  },
+  created() {
+    const product = this.$store.state.product.product
+    if (!product) {
+      this.$router.push({
+        path: '/list'
+      })
+      this.$message.warning('请选择一条数据')
+      return
+    }
+    this.loanTime = product.loanTime.split(',').map(item => {
+      return {
+        time: item
+      }
+    })
+    this.loanAmount = product.loanAmount.split(',').map(item => {
+      return {
+        price: item
+      }
+    })
+    this.applicationRequirements = product.applicationRequirements
+      .split(',')
+      .map(item => {
+        return {
+          text: item
+        }
+      })
+
+    this.productDescription = product.productDescription
+      .split(',')
+      .map(item => {
+        return {
+          text: item
+        }
+      })
+
+    this.form = Object.assign(product, {
+      loanTime: [], // 时间
+      loanAmount: [], // 金额
+      applicationRequirements: [], // 条件
+      productDescription: [] // 描述
+    })
+    this.imageUrl = product.productIcon
+    this.apkUrl = product.url
+    this.fileList = [{ name: `${product.name}.apk`, url: product.url }]
   },
   methods: {
     uploadFile(file) {
@@ -201,9 +242,7 @@ export default {
       })
     },
     onSubmit() {
-      if (this.form.name === '') {
-        return this.$message.error('产品名称不可为空')
-      }
+      console.log(this.applicationRequirements)
       this.applicationRequirements.forEach(item => {
         this.form.applicationRequirements.push(item.text)
       })
@@ -221,50 +260,11 @@ export default {
         applicationRequirements: this.form.applicationRequirements.join(','),
         productDescription: this.form.productDescription.join(','),
         loanTime: this.form.loanTime.join(','),
-        loanAmount: this.form.loanAmount.join(','),
-        productIcon: this.imageUrl,
-        url: this.apkUrl
+        loanAmount: this.form.loanAmount.join(',')
       })
       insetProduct(this.form).then(res => {
-        console.log(res)
         const { code } = res
         if (code === '200') {
-          this.loanTime = [
-            {
-              time: ''
-            }
-          ] // 时间
-          this.loanAmount = [
-            {
-              price: ''
-            }
-          ]
-          this.productDescription = [
-            {
-              text: ''
-            }
-          ] // 描述
-          this.applicationRequirements = [
-            {
-              text: ''
-            }
-          ] // 条件
-          this.fileList = []
-          this.apkUrl = ''
-          this.imageUrl = ''
-          this.form = {
-            name: '',
-            loanTime: [], // 时间
-            interestRate: '', // 利率
-            loanAmount: [], // 金额
-            applicationRequirements: [], // 条件
-            productDescription: [], // 描述
-            googleUrl: '', // 路径
-            productIcon: '', // 图标
-            approvalRate: '', // 通过率
-            sort: '', // 排序
-            installmentPeriods: '' // 可分期
-          }
           this.$message.success('添加成功')
         } else {
           this.$message.error('添加失败')
@@ -328,7 +328,8 @@ export default {
       return isFileType && isLt30M
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList)
+      this.fileList = []
+      this.apkUrl = ''
     },
     handleExceed(files, fileList) {
       this.$message.warning(
