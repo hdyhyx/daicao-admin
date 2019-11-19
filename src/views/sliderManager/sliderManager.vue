@@ -19,7 +19,7 @@
                 v-if="scope.row.address"
                 width="80px"
                 height="80px"
-                :src="'http://192.168.1.103'+scope.row.address"
+                :src="'http://47.74.180.93:9511/'+scope.row.address"
               />
             </div>
           </template>
@@ -44,7 +44,7 @@
       </div>
     </el-card>
     <!-- Form -->
-    <el-dialog title="轮播图" :visible.sync="dialogFormVisible">
+    <el-dialog title="轮播图" :visible.sync="dialogFormVisible" @close="closeSlider">
       <el-form :model="form">
         <el-form-item label="上传图片" :label-width="formLabelWidth">
           <el-upload
@@ -54,7 +54,7 @@
             :http-request="uploadFile"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="form.address" :src="form.address" class="avatar" />
+            <img v-if="form.address" :src="'http://47.74.180.93:9511/'+form.address" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -101,6 +101,13 @@ export default {
     this.getBannerList(this.currentPage4, this.pageSize)
   },
   methods: {
+    closeSlider() {
+      this.form = {
+        url: '',
+        address: '',
+        isValid: '1'
+      }
+    },
     handelSaveBanner() {
       if (this.form.url === '' && this.form.address === '') {
         return this.$message.error('图片与商品ID不可为空')
