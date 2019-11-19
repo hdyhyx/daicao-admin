@@ -18,3 +18,12 @@ export function getProductList(data) {
     data
   })
 }
+
+export function getProductDelete(data) {
+  data = qs.stringify(data)
+  return request({
+    url: 'product/deleteProduct',
+    method: 'post',
+    data
+  })
+}

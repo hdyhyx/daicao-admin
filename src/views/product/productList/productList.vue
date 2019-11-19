@@ -49,7 +49,7 @@
               v-if="scope.row.productIcon"
               width="80px"
               height="80px"
-              :src="'http://192.168.1.103'+scope.row.productIcon"
+              :src="'http://47.74.180.93:9511'+scope.row.productIcon"
             />
           </template>
         </el-table-column>
@@ -57,6 +57,7 @@
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)">查看/编辑</el-button>
+            <el-button type="text" size="small" @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -76,7 +77,7 @@
 </template>
 
 <script>
-import { getProductList } from '@/api/product'
+import { getProductList, getProductDelete } from '@/api/product'
 export default {
   data() {
     return {
@@ -94,6 +95,49 @@ export default {
     this.getProductList(this.currentPage4, this.pageSize)
   },
   methods: {
+    handleDelete(row) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          const formData = Object.assign(
+            {},
+            {
+              productId: row.id
+            }
+          )
+          getProductDelete(formData).then(res => {
+            console.log(res)
+            const { code } = res
+            if (code !== '200') {
+              this.$message({
+                type: 'error',
+                message: '删除失败!'
+              })
+            } else {
+              this.form = {
+                name: '',
+                isSort: ''
+              }
+              this.pageSize = 10
+              this.currentPage4 = 1
+              this.getProductList(this.currentPage4, this.pageSize)
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            }
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
     onSubmit() {
       this.pageSize = 10
       this.currentPage4 = 1

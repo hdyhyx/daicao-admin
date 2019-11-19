@@ -216,7 +216,6 @@ export default {
       this.loanAmount.forEach(item => {
         this.form.loanAmount.push(item.price)
       })
-      console.log(this.form)
       this.form = Object.assign(this.form, {
         applicationRequirements: this.form.applicationRequirements.join(','),
         productDescription: this.form.productDescription.join(','),
